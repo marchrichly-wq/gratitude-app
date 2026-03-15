@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>每日感恩練習</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f7f6f3; --surface: #ffffff;
+    --border: rgba(0,0,0,0.07); --border-hover: rgba(0,0,0,0.15);
+    --text-primary: #1a1a18; --text-secondary: #6b6b65; --text-tertiary: #aeaea6;
+    --radius-md: 12px; --radius-lg: 16px;
+    --font: 'Noto Sans TC', system-ui, sans-serif;
+  }
+  html, body { height: 100%; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text-primary); -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+
+  /* 登入畫面 */
+  .login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+  .login-logo { font-size: 48px; margin-bottom: 1.5rem; }
+  .login-title { font-size: 24px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; text-align: center; }
+  .login-sub { font-size: 14px; color: var(--text-secondary); text-align: center; line-height: 1.7; margin-bottom: 2.5rem; }
+  .login-btn { display: flex; align-items: center; gap: 12px; padding: 14px 28px; border-radius: var(--radius-lg); border: 1px solid var(--border-hover); background: var(--surface); color: var(--text-primary); font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.15s; -webkit-appearance: none; }
+  .login-btn:active { background: #f0eeea; transform: scale(0.98); }
+  .login-btn img { width: 20px; height: 20px; }
+
+  /* 主畫面 */
+  .app { max-width: 480px; margin: 0 auto; padding: 2rem 1.1rem 7rem; display: none; }
+  .header { margin-bottom: 1.75rem; }
+  .header-row { display: flex; align-items: flex-start; justify-content: space-between; }
+  .date-label { font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.07em; margin-bottom: 5px; }
+  .app-title { font-size: 24px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.01em; }
+  .app-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.6; }
+  .user-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; font-family: var(--font); white-space: nowrap; flex-shrink: 0; margin-top: 4px; -webkit-appearance: none; }
+  .user-avatar { width: 22px; height: 22px; border-radius: 50%; }
+
+  .nav { display: flex; gap: 6px; margin-bottom: 1.75rem; }
+  .nav-btn { padding: 8px 20px; border-radius: 999px; border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: var(--font); -webkit-appearance: none; }
+  .nav-btn.active { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+
+  .section-divider { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; margin: 1.5rem 0 10px; display: flex; align-items: center; gap: 10px; }
+  .section-divider:first-child { margin-top: 0; }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .streak-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
+  .streak-num { font-size: 22px; font-weight: 600; color: var(--text-primary); }
+  .streak-label { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  .gratitude-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; margin-bottom: 10px; transition: border-color 0.15s; }
+  .gratitude-card:focus-within { border-color: var(--border-hover); }
+  .card-label { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .label-text { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+  .label-sub { font-size: 11px; color: var(--text-tertiary); margin-left: 2px; }
+  textarea { width: 100%; border: none; outline: none; resize: none; font-size: 15px; color: var(--text-primary); background: transparent; font-family: var(--font); line-height: 1.8; min-height: 64px; -webkit-appearance: none; }
+  textarea::placeholder { color: var(--text-tertiary); }
+  .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+  .btn-save { width: 100%; padding: 15px; border-radius: var(--radius-lg); border: none; background: var(--text-primary); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: all 0.15s; font-family: var(--font); -webkit-appearance: none; letter-spacing: 0.02em; }
+  .btn-save:active { transform: scale(0.98); opacity: 0.85; }
+  .btn-outline { width: 100%; padding: 12px; border-radius: var(--radius-lg); border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 10px; font-family: var(--font); -webkit-appearance: none; transition: all 0.15s; }
+  .btn-outline:active { background: #f0eeea; }
+
+  .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; margin-bottom: 10px; }
+  .settings-row { display: flex; align-items: center; gap: 10px; }
+  .settings-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .settings-input { flex: 1; border: none; outline: none; font-size: 15px; font-weight: 500; color: var(--text-primary); background: transparent; font-family: var(--font); padding: 2px 0; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
+  .settings-input:focus { border-bottom-color: var(--border-hover); }
+  .settings-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; margin-left: 17px; line-height: 1.5; font-style: italic; }
+
+  .add-date-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; }
+  .date-input { flex: 1; padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background: var(--surface); color: var(--text-primary); font-size: 14px; font-family: var(--font); outline: none; -webkit-appearance: none; }
+  .add-btn { padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background: var(--surface); color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); white-space: nowrap; -webkit-appearance: none; }
+  .add-btn:active { background: #f0eeea; }
+  .section-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+
+  .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem; margin-bottom: 10px; cursor: pointer; }
+  .history-card:active { background: #fafaf8; }
+  .history-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .history-date { font-size: 12px; color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.03em; }
+  .edit-badge { font-size: 11px; color: var(--text-tertiary); padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); }
+  .history-row { display: flex; gap: 10px; margin-bottom: 9px; align-items: flex-start; }
+  .history-row:last-of-type { margin-bottom: 0; }
+  .hdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .hcategory { font-size: 11px; color: var(--text-tertiary); margin-bottom: 2px; }
+  .htext { font-size: 13px; color: var(--text-primary); line-height: 1.65; }
+  .empty-day { font-size: 13px; color: var(--text-tertiary); }
+  .history-group-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; margin: 10px 0 6px; }
+
+  .edit-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+  .back-btn { padding: 7px 15px; border-radius: 999px; border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); -webkit-appearance: none; }
+  .back-btn:active { background: #f0eeea; }
+  .edit-date-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+  .empty { text-align: center; padding: 4rem 1rem; color: var(--text-tertiary); font-size: 14px; line-height: 2.4; }
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: #fff; border-radius: 999px; padding: 10px 24px; font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 999; white-space: nowrap; font-family: var(--font); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+  .toast.show { opacity: 1; }
+
+  .syncing { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 8px; }
+</style>
+</head>
+<body>
+
+<!-- 登入畫面 -->
+<div class="login-screen" id="login-screen">
+  <div class="login-logo">🙏</div>
+  <div class="login-title">每日感恩練習</div>
+  <div class="login-sub">感恩、隨喜、祝福、欣賞<br>把美好留下來，跟著你走</div>
+  <button class="login-btn" onclick="signIn()">
+    <img src="https://www.google.com/favicon.ico" />
+    用 Google 帳號登入
+  </button>
+</div>
+
+<!-- 主畫面 -->
+<div class="app" id="main-app">
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <div class="date-label" id="top-date"></div>
+        <div class="app-title">每日感恩練習</div>
+        <div class="app-sub">感恩、隨喜、祝福、欣賞——把美好留下來</div>
+      </div>
+      <button class="user-btn" id="user-btn" onclick="signOut()">
+        <img class="user-avatar" id="user-avatar" src="" />
+        <span id="user-name"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('today')">今日記錄</button>
+    <button class="nav-btn" onclick="showTab('history')">歷史回顧</button>
+    <button class="nav-btn" onclick="showTab('settings')">設定</button>
+  </div>
+
+  <div id="tab-today">
+    <div class="streak-bar">
+      <div class="streak-num" id="streak-num">0</div>
+      <div class="streak-label">連續記錄天數<br><span style="color:var(--text-tertiary);font-size:11px;">每天儲存即可累積</span></div>
+    </div>
+    <div id="cards-today"></div>
+    <div class="divider"></div>
+    <button class="btn-save" onclick="saveDate(getToday(), true, 'cards-today')">儲存今日記錄</button>
+    <div class="syncing" id="sync-status"></div>
+  </div>
+
+  <div id="tab-history" style="display:none;">
+    <div id="history-list-view">
+      <div class="add-date-row">
+        <input type="date" class="date-input" id="new-date-input" />
+        <button class="add-btn" onclick="addNewDate()">補寫</button>
+      </div>
+      <div class="section-label">所有紀錄</div>
+      <div id="history-container"></div>
+    </div>
+    <div id="history-edit-view" style="display:none;">
+      <div class="edit-header">
+        <button class="back-btn" onclick="saveEditAndBack()">← 返回</button>
+        <div class="edit-date-title" id="edit-date-title"></div>
+      </div>
+      <div id="cards-edit"></div>
+      <div class="divider"></div>
+      <button class="btn-save" onclick="saveEditAndBack()">儲存並返回</button>
+    </div>
+  </div>
+
+  <div id="tab-settings" style="display:none;">
+    <div class="section-divider">五感恩標題自訂</div>
+    <div id="settings-cards"></div>
+    <div class="divider"></div>
+    <button class="btn-save" onclick="saveSettings()">儲存設定</button>
+    <button class="btn-outline" onclick="resetSettings()">恢復預設標題</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAeow3LVdf0tkdfjgioSdHXDzOLrRN11-E",
+  authDomain: "grateful-for-daily.firebaseapp.com",
+  projectId: "grateful-for-daily",
+  storageBucket: "grateful-for-daily.firebasestorage.app",
+  messagingSenderId: "833440797884",
+  appId: "1:833440797884:web:1a340ce1fc146e8e6decb9",
+  measurementId: "G-SCBLZ0MCM4"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const DEFAULT_CATS = [
+  { group: '感恩', label: '感恩上級', color: '#9F99E8' },
+  { group: '感恩', label: '感恩父母', color: '#5DCAA5' },
+  { group: '感恩', label: '感恩伴侶', color: '#ED93B1' },
+  { group: '感恩', label: '感恩自己', color: '#EF9F27' },
+  { group: '感恩', label: '感恩宇宙', color: '#85B7EB' },
+  { group: '延伸', label: '隨喜', color: '#C084FC', sub: '隨喜他人的美好之處', fixed: true },
+  { group: '延伸', label: '祝福', color: '#34D399', sub: '祝福美好', fixed: true },
+  { group: '延伸', label: '欣賞', color: '#FB923C', sub: '欣賞美好之處', fixed: true },
+];
+
+let currentUser = null;
+let userLabels = null;
+let editingDate = null;
+let localCache = {};
+
+const getToday = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+};
+const fmtDate = d => {
+  const dt = new Date(d + 'T00:00:00');
+  const days = ['日','一','二','三','四','五','六'];
+  return `${dt.getFullYear()} 年 ${dt.getMonth()+1} 月 ${dt.getDate()} 日（週${days[dt.getDay()]}）`;
+};
+
+function getCats() {
+  return DEFAULT_CATS.map((cat, i) => ({
+    ...cat,
+    label: (!cat.fixed && userLabels && userLabels[i]) ? userLabels[i] : cat.label
+  }));
+}
+
+function getPlaceholder(label) {
+  const map = {
+    '感恩上級': '今天上級做了什麼讓你感恩的事？',
+    '感恩父母': '父母的哪個舉動或存在讓你心生感謝？',
+    '感恩伴侶': '伴侶今天帶給你什麼溫暖或支持？',
+    '感恩自己': '今天你為自己做了什麼值得肯定的事？',
+    '感恩宇宙': '有什麼讓你感受到宇宙的眷顧或巧合？',
+    '隨喜': '今天誰的美好讓你感到由衷的喜悅？',
+    '祝福': '你想把祝福送給誰，祝福他什麼？',
+    '欣賞': '今天你欣賞到什麼美好的事物或時刻？',
+  };
+  return map[label] || `關於「${label}」，今天有什麼讓你心存感謝？`;
+}
+
+// Firebase 讀寫
+async function loadRecord(date) {
+  if (localCache[date]) return localCache[date];
+  try {
+    const ref = doc(db, 'users', currentUser.uid, 'records', date);
+    const snap = await getDoc(ref);
+    const data = snap.exists() ? snap.data() : {};
+    localCache[date] = data;
+    return data;
+  } catch(e) { return {}; }
+}
+
+async function saveRecord(date, data) {
+  localCache[date] = data;
+  try {
+    setSyncStatus('儲存中…');
+    const ref = doc(db, 'users', currentUser.uid, 'records', date);
+    await setDoc(ref, data);
+    setSyncStatus('已同步 ✓');
+    setTimeout(() => setSyncStatus(''), 2000);
+  } catch(e) {
+    setSyncStatus('同步失敗，請檢查網路');
+  }
+}
+
+async function loadLabels() {
+  try {
+    const ref = doc(db, 'users', currentUser.uid, 'settings', 'labels');
+    const snap = await getDoc(ref);
+    userLabels = snap.exists() ? snap.data().labels : null;
+  } catch(e) { userLabels = null; }
+}
+
+async function saveLabels(labels) {
+  try {
+    const ref = doc(db, 'users', currentUser.uid, 'settings', 'labels');
+    await setDoc(ref, { labels });
+    userLabels = labels;
+  } catch(e) {}
+}
+
+async function loadAllDates() {
+  try {
+    const col = collection(db, 'users', currentUser.uid, 'records');
+    const snap = await getDocs(col);
+    const result = {};
+    snap.forEach(d => { result[d.id] = d.data(); localCache[d.id] = d.data(); });
+    return result;
+  } catch(e) { return {}; }
+}
+
+function setSyncStatus(msg) {
+  const el = document.getElementById('sync-status');
+  if (el) el.textContent = msg;
+}
+
+// 登入登出
+window.signIn = async () => {
+  const provider = new GoogleAuthProvider();
+  try { await signInWithPopup(auth, provider); } catch(e) { showToast('登入失敗，請再試一次'); }
+};
+
+window.signOut = async () => {
+  if (!confirm('確定要登出嗎？')) return;
+  await fbSignOut(auth);
+};
+
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    document.getElementById('user-name').textContent = user.displayName?.split(' ')[0] || '登出';
+    document.getElementById('user-avatar').src = user.photoURL || '';
+    await loadLabels();
+    document.getElementById('top-date').textContent = fmtDate(getToday());
+    document.getElementById('new-date-input').value = getToday();
+    await renderCards('cards-today', getToday());
+    updateStreak();
+  } else {
+    currentUser = null;
+    localCache = {};
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+  }
+});
+
+// 渲染卡片
+async function renderCards(containerId, date) {
+  const rec = await loadRecord(date);
+  const cats = getCats();
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  let lastGroup = null;
+  cats.forEach((cat, i) => {
+    if (cat.group !== lastGroup) {
+      const gl = document.createElement('div');
+      gl.className = 'section-divider';
+      gl.textContent = cat.group === '感恩' ? '五感恩' : '隨喜 · 祝福 · 欣賞';
+      c.appendChild(gl);
+      lastGroup = cat.group;
+    }
+    const d = document.createElement('div');
+    d.className = 'gratitude-card';
+    const subHtml = cat.sub ? `<span class="label-sub">· ${cat.sub}</span>` : '';
+    d.innerHTML = `<div class="card-label"><div class="dot" style="background:${cat.color}"></div><div class="label-text">${cat.label}</div>${subHtml}</div><textarea id="${containerId}-f${i}" placeholder="${getPlaceholder(cat.label)}" rows="3">${rec[i]||''}</textarea>`;
+    c.appendChild(d);
+  });
+}
+
+function getValues(containerId) {
+  const data = {};
+  getCats().forEach((_, i) => {
+    data[i] = (document.getElementById(`${containerId}-f${i}`)||{}).value?.trim()||'';
+  });
+  return data;
+}
+
+window.saveDate = async (date, notify, containerId) => {
+  const data = getValues(containerId);
+  await saveRecord(date, data);
+  updateStreak();
+  if (notify) showToast('已儲存 ✓');
+};
+
+async function updateStreak() {
+  const all = await loadAllDates();
+  const filled = Object.keys(all).filter(k => getCats().some((_, i) => all[k][i] && all[k][i].trim())).sort((a,b)=>b.localeCompare(a));
+  let streak = 0, cursor = new Date(getToday() + 'T00:00:00');
+  for (let k of filled) {
+    const diff = Math.round((cursor - new Date(k + 'T00:00:00')) / 86400000);
+    if (diff > 1) break;
+    streak++; cursor = new Date(k + 'T00:00:00');
+  }
+  const el = document.getElementById('streak-num');
+  if (el) el.textContent = streak;
+}
+
+async function renderHistory() {
+  const all = await loadAllDates();
+  const keys = Object.keys(all).sort((a,b)=>b.localeCompare(a));
+  const c = document.getElementById('history-container');
+  if (!keys.length) { c.innerHTML = '<div class="empty">還沒有歷史紀錄<br>先從今日開始吧</div>'; return; }
+  c.innerHTML = '';
+  const cats = getCats();
+  keys.forEach(date => {
+    const card = document.createElement('div');
+    card.className = 'history-card';
+    card.onclick = () => openEdit(date);
+    let gratRows = '', extRows = '';
+    cats.forEach((cat, i) => {
+      const t = all[date][i];
+      if (!t) return;
+      const row = `<div class="history-row"><div class="hdot" style="background:${cat.color}"></div><div><div class="hcategory">${cat.label}</div><div class="htext">${t}</div></div></div>`;
+      if (cat.group === '感恩') gratRows += row;
+      else extRows += row;
+    });
+    let inner = '';
+    if (gratRows) inner += `<div class="history-group-label">感恩</div>${gratRows}`;
+    if (extRows) inner += `<div class="history-group-label">隨喜 · 祝福 · 欣賞</div>${extRows}`;
+    if (!inner) inner = '<div class="empty-day">尚未填寫，點此補寫</div>';
+    card.innerHTML = `<div class="history-card-header"><div class="history-date">${fmtDate(date)}</div><div class="edit-badge">編輯</div></div>${inner}`;
+    c.appendChild(card);
+  });
+}
+
+async function openEdit(date) {
+  editingDate = date;
+  document.getElementById('history-list-view').style.display = 'none';
+  document.getElementById('history-edit-view').style.display = '';
+  document.getElementById('edit-date-title').textContent = fmtDate(date);
+  await renderCards('cards-edit', date);
+}
+
+window.saveEditAndBack = async () => {
+  if (editingDate) await saveDate(editingDate, false, 'cards-edit');
+  showToast('已儲存 ✓');
+  setTimeout(() => {
+    editingDate = null;
+    document.getElementById('history-list-view').style.display = '';
+    document.getElementById('history-edit-view').style.display = 'none';
+    renderHistory();
+  }, 600);
+};
+
+window.addNewDate = async () => {
+  const input = document.getElementById('new-date-input');
+  const date = input.value;
+  if (!date) { showToast('請先選擇日期'); return; }
+  input.value = '';
+  await openEdit(date);
+};
+
+// 設定
+function renderSettings() {
+  const cats = getCats();
+  const c = document.getElementById('settings-cards');
+  c.innerHTML = '';
+  cats.filter(cat => !cat.fixed).forEach((cat, i) => {
+    const d = document.createElement('div');
+    d.className = 'settings-card';
+    d.innerHTML = `<div class="settings-row"><div class="settings-dot" style="background:${cat.color}"></div><input class="settings-input" id="settings-f${i}" type="text" value="${cat.label}" maxlength="12" /></div><div class="settings-hint" id="settings-hint${i}">${getPlaceholder(cat.label)}</div>`;
+    c.appendChild(d);
+    setTimeout(() => {
+      const input = document.getElementById(`settings-f${i}`);
+      const hint = document.getElementById(`settings-hint${i}`);
+      if (input && hint) input.addEventListener('input', () => { hint.textContent = getPlaceholder(input.value) || `關於「${input.value}」，今天有什麼讓你心存感謝？`; });
+    }, 0);
+  });
+}
+
+window.saveSettings = async () => {
+  const cats = getCats();
+  const labels = cats.map((cat, i) => {
+    if (cat.fixed) return cat.label;
+    const el = document.getElementById(`settings-f${i}`);
+    return el ? el.value.trim() || cat.label : cat.label;
+  });
+  await saveLabels(labels);
+  await renderCards('cards-today', getToday());
+  showToast('設定已儲存 ✓');
+};
+
+window.resetSettings = async () => {
+  await saveLabels(null);
+  userLabels = null;
+  renderSettings();
+  await renderCards('cards-today', getToday());
+  showToast('已恢復預設標題');
+};
+
+window.showTab = (tab) => {
+  ['today','history','settings'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t===tab ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach((b,i) =>
+    b.classList.toggle('active', ['today','history','settings'][i]===tab)
+  );
+  if (tab==='history') renderHistory();
+  if (tab==='settings') renderSettings();
+};
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+window.showToast = showToast;
+window.getToday = getToday;
+</script>
+</body>
+</html>
