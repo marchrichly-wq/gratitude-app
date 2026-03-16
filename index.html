@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -20,8 +19,6 @@
   }
   html, body { height: 100%; }
   body { font-family: var(--font); background: var(--bg); color: var(--text-primary); -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
-
-  /* 登入畫面 */
   .login-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
   .login-logo { font-size: 48px; margin-bottom: 1.5rem; }
   .login-title { font-size: 24px; font-weight: 600; color: var(--text-primary); margin-bottom: 8px; text-align: center; }
@@ -29,8 +26,6 @@
   .login-btn { display: flex; align-items: center; gap: 12px; padding: 14px 28px; border-radius: var(--radius-lg); border: 1px solid var(--border-hover); background: var(--surface); color: var(--text-primary); font-size: 15px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.15s; -webkit-appearance: none; }
   .login-btn:active { background: #f0eeea; transform: scale(0.98); }
   .login-btn img { width: 20px; height: 20px; }
-
-  /* 主畫面 */
   .app { max-width: 480px; margin: 0 auto; padding: 2rem 1.1rem 7rem; display: none; }
   .header { margin-bottom: 1.75rem; }
   .header-row { display: flex; align-items: flex-start; justify-content: space-between; }
@@ -39,19 +34,15 @@
   .app-sub { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.6; }
   .user-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; font-family: var(--font); white-space: nowrap; flex-shrink: 0; margin-top: 4px; -webkit-appearance: none; }
   .user-avatar { width: 22px; height: 22px; border-radius: 50%; }
-
   .nav { display: flex; gap: 6px; margin-bottom: 1.75rem; }
   .nav-btn { padding: 8px 20px; border-radius: 999px; border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; font-family: var(--font); -webkit-appearance: none; }
   .nav-btn.active { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
-
   .section-divider { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; margin: 1.5rem 0 10px; display: flex; align-items: center; gap: 10px; }
   .section-divider:first-child { margin-top: 0; }
   .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
   .streak-bar { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 10px 14px; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 10px; }
   .streak-num { font-size: 22px; font-weight: 600; color: var(--text-primary); }
   .streak-label { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
-
   .gratitude-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; margin-bottom: 10px; transition: border-color 0.15s; }
   .gratitude-card:focus-within { border-color: var(--border-hover); }
   .card-label { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
@@ -61,25 +52,21 @@
   textarea { width: 100%; border: none; outline: none; resize: none; font-size: 15px; color: var(--text-primary); background: transparent; font-family: var(--font); line-height: 1.8; min-height: 64px; -webkit-appearance: none; }
   textarea::placeholder { color: var(--text-tertiary); }
   .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
-
   .btn-save { width: 100%; padding: 15px; border-radius: var(--radius-lg); border: none; background: var(--text-primary); color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 4px; transition: all 0.15s; font-family: var(--font); -webkit-appearance: none; letter-spacing: 0.02em; }
   .btn-save:active { transform: scale(0.98); opacity: 0.85; }
   .btn-outline { width: 100%; padding: 12px; border-radius: var(--radius-lg); border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; margin-top: 10px; font-family: var(--font); -webkit-appearance: none; transition: all 0.15s; }
   .btn-outline:active { background: #f0eeea; }
-
   .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.1rem; margin-bottom: 10px; }
   .settings-row { display: flex; align-items: center; gap: 10px; }
   .settings-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
   .settings-input { flex: 1; border: none; outline: none; font-size: 15px; font-weight: 500; color: var(--text-primary); background: transparent; font-family: var(--font); padding: 2px 0; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
   .settings-input:focus { border-bottom-color: var(--border-hover); }
   .settings-hint { font-size: 12px; color: var(--text-tertiary); margin-top: 6px; margin-left: 17px; line-height: 1.5; font-style: italic; }
-
   .add-date-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; }
   .date-input { flex: 1; padding: 10px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background: var(--surface); color: var(--text-primary); font-size: 14px; font-family: var(--font); outline: none; -webkit-appearance: none; }
   .add-btn { padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-hover); background: var(--surface); color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); white-space: nowrap; -webkit-appearance: none; }
   .add-btn:active { background: #f0eeea; }
   .section-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
-
   .history-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem; margin-bottom: 10px; cursor: pointer; }
   .history-card:active { background: #fafaf8; }
   .history-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -92,22 +79,17 @@
   .htext { font-size: 13px; color: var(--text-primary); line-height: 1.65; }
   .empty-day { font-size: 13px; color: var(--text-tertiary); }
   .history-group-label { font-size: 10px; font-weight: 600; color: var(--text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; margin: 10px 0 6px; }
-
   .edit-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
   .back-btn { padding: 7px 15px; border-radius: 999px; border: 1px solid var(--border-hover); background: transparent; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font); -webkit-appearance: none; }
   .back-btn:active { background: #f0eeea; }
   .edit-date-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-
   .empty { text-align: center; padding: 4rem 1rem; color: var(--text-tertiary); font-size: 14px; line-height: 2.4; }
   .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: var(--text-primary); color: #fff; border-radius: 999px; padding: 10px 24px; font-size: 13px; font-weight: 500; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 999; white-space: nowrap; font-family: var(--font); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
   .toast.show { opacity: 1; }
-
   .syncing { font-size: 11px; color: var(--text-tertiary); text-align: center; margin-top: 8px; }
 </style>
 </head>
 <body>
-
-<!-- 登入畫面 -->
 <div class="login-screen" id="login-screen">
   <div class="login-logo">🙏</div>
   <div class="login-title">每日感恩練習</div>
@@ -117,8 +99,6 @@
     用 Google 帳號登入
   </button>
 </div>
-
-<!-- 主畫面 -->
 <div class="app" id="main-app">
   <div class="header">
     <div class="header-row">
@@ -133,13 +113,11 @@
       </button>
     </div>
   </div>
-
   <div class="nav">
     <button class="nav-btn active" onclick="showTab('today')">今日記錄</button>
     <button class="nav-btn" onclick="showTab('history')">歷史回顧</button>
     <button class="nav-btn" onclick="showTab('settings')">設定</button>
   </div>
-
   <div id="tab-today">
     <div class="streak-bar">
       <div class="streak-num" id="streak-num">0</div>
@@ -150,7 +128,6 @@
     <button class="btn-save" onclick="saveDate(getToday(), true, 'cards-today')">儲存今日記錄</button>
     <div class="syncing" id="sync-status"></div>
   </div>
-
   <div id="tab-history" style="display:none;">
     <div id="history-list-view">
       <div class="add-date-row">
@@ -170,7 +147,6 @@
       <button class="btn-save" onclick="saveEditAndBack()">儲存並返回</button>
     </div>
   </div>
-
   <div id="tab-settings" style="display:none;">
     <div class="section-divider">五感恩標題自訂</div>
     <div id="settings-cards"></div>
@@ -179,10 +155,7 @@
     <button class="btn-outline" onclick="resetSettings()">恢復預設標題</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut as fbSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
@@ -249,7 +222,6 @@ function getPlaceholder(label) {
   return map[label] || `關於「${label}」，今天有什麼讓你心存感謝？`;
 }
 
-// Firebase 讀寫
 async function loadRecord(date) {
   if (localCache[date]) return localCache[date];
   try {
@@ -308,11 +280,16 @@ function setSyncStatus(msg) {
 // 登入登出
 window.signIn = async () => {
   const provider = new GoogleAuthProvider();
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   try {
-    if (isMobile) { await signInWithRedirect(auth, provider); }
-    else { await signInWithPopup(auth, provider); }
-  } catch(e) { showToast('登入失敗，請再試一次'); }
+    await signInWithPopup(auth, provider);
+  } catch(e) {
+    if (e.code === 'auth/popup-blocked') {
+      try { await signInWithRedirect(auth, provider); } catch(e2) { showToast('登入失敗，請再試一次'); }
+    } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+      console.error('Auth error:', e.code, e.message);
+      showToast('登入失敗，請再試一次');
+    }
+  }
 };
 
 window.signOut = async () => {
@@ -320,8 +297,11 @@ window.signOut = async () => {
   await fbSignOut(auth);
 };
 
-// Handle redirect result on page load
-getRedirectResult(auth).catch(() => {});
+getRedirectResult(auth).then(result => {
+  if (result?.user) console.log('Redirect login OK');
+}).catch(e => {
+  console.error('Redirect result error:', e.code, e.message);
+});
 
 onAuthStateChanged(auth, async user => {
   if (user) {
@@ -343,7 +323,6 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-// 渲染卡片
 async function renderCards(containerId, date) {
   const rec = await loadRecord(date);
   const cats = getCats();
@@ -449,7 +428,6 @@ window.addNewDate = async () => {
   await openEdit(date);
 };
 
-// 設定
 function renderSettings() {
   const cats = getCats();
   const c = document.getElementById('settings-cards');
