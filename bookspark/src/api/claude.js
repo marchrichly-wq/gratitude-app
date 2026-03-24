@@ -6,13 +6,24 @@ const LOADING_MESSAGES = [
   '正在注入靈感能量...',
   '正在優化文案節奏...',
   '正在生成多角度版本...',
+  '正在融合聯網資料增加權威感...',
+  '正在把知識變成你的超能力...',
 ]
 
 export function getRandomLoadingMessage() {
   return LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)]
 }
 
-function buildSystemPrompt(creatorPosition, coreValues) {
+function buildSystemPrompt(creatorPosition, coreValues, bookContext) {
+  const bookContextBlock = bookContext
+    ? `
+## 📚 聯網查到的書本真實背景資料（請務必融入貼文中以增加權威感）
+${typeof bookContext === 'string' ? bookContext : JSON.stringify(bookContext, null, 2)}
+
+重要：請將上述聯網查到的真實資料（作者背景、書本核心論點、經典金句等）自然地融入貼文中，讓內容更有深度與可信度。引用金句時務必標明出處。
+`
+    : ''
+
   return `你是一位專業的說書人與知識萃取教練，同時也是社群爆款文案的高手。
 
 ## 你的身份背景
@@ -21,7 +32,7 @@ function buildSystemPrompt(creatorPosition, coreValues) {
 
 ## 寫作風格
 邏輯清晰、引人入勝、像朋友分享好書一樣自然親切，同時帶有專業深度。
-
+${bookContextBlock}
 ## 文章架構要求
 每篇內容必須嚴格符合以下架構：
 1. **HOOK（吸引注意）**：用一句震撼人心的話或反直覺觀點開場，讓人忍不住往下看
@@ -33,6 +44,7 @@ function buildSystemPrompt(creatorPosition, coreValues) {
 2. 結尾必須有一個引導讀者分享自己看法的開放式提問
 3. 加入適當的 emoji 增加可讀性（但不要過度使用）
 4. 每篇字數控制在 300-500 字之間，適合社群平台閱讀
+5. 如果有提供聯網書本背景資料，務必引用真實金句與作者背景，避免產生幻覺
 
 ## 產出格式
 請產出 3 種不同角度的版本，並以 JSON 格式回傳：
@@ -74,7 +86,7 @@ function buildSystemPrompt(creatorPosition, coreValues) {
 重要：請只回傳純 JSON，不要加任何 markdown 代碼塊標記或額外文字。`
 }
 
-export async function generatePosts(apiKey, creatorPosition, coreValues, readingNote) {
+export async function generatePosts(apiKey, creatorPosition, coreValues, readingNote, bookContext) {
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -86,7 +98,7 @@ export async function generatePosts(apiKey, creatorPosition, coreValues, reading
     body: JSON.stringify({
       model: 'claude-sonnet-4-6-20250514',
       max_tokens: 4096,
-      system: buildSystemPrompt(creatorPosition, coreValues),
+      system: buildSystemPrompt(creatorPosition, coreValues, bookContext),
       messages: [
         {
           role: 'user',

@@ -1,23 +1,76 @@
 import { useState } from 'react'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { generatePosts } from './api/claude'
+import { searchBookInfo, generateReadingNoteFromBook } from './api/gemini'
 import SettingsPanel from './components/SettingsPanel'
 import InputArea from './components/InputArea'
+import BookInfoCard from './components/BookInfoCard'
 import LoadingState from './components/LoadingState'
 import ResultCard from './components/ResultCard'
 
 function App() {
   // Persistent settings (localStorage)
   const [apiKey, setApiKey] = useLocalStorage('bookspark_api_key', '')
+  const [geminiApiKey, setGeminiApiKey] = useLocalStorage('bookspark_gemini_api_key', '')
   const [creatorPosition, setCreatorPosition] = useLocalStorage('bookspark_creator_position', '')
   const [coreValues, setCoreValues] = useLocalStorage('bookspark_core_values', '')
 
   // Dynamic state
+  const [bookTitle, setBookTitle] = useState('')
   const [readingNote, setReadingNote] = useState('')
+  const [bookInfo, setBookInfo] = useState(null)
   const [results, setResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isSearching, setIsSearching] = useState(false)
   const [error, setError] = useState('')
 
+  // Search book info via Gemini
+  const handleSearchBook = async (title) => {
+    if (!geminiApiKey.trim() || !title) return null
+    setIsSearching(true)
+    try {
+      const info = await searchBookInfo(geminiApiKey, title)
+      setBookInfo(info)
+      return info
+    } catch (err) {
+      console.warn('Book search failed:', err.message)
+      return null
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  // Random recommendation flow
+  const handleRandomRecommend = async (book) => {
+    if (!geminiApiKey.trim()) {
+      setError('請先在「固定設定區」填入 Gemini API Key 以啟用聯網搜尋與隨機推薦功能')
+      return
+    }
+
+    setError('')
+    setResults(null)
+    setBookInfo(null)
+    setIsSearching(true)
+
+    try {
+      // Run both in parallel: search book info + generate reading note
+      const [info, note] = await Promise.all([
+        searchBookInfo(geminiApiKey, book.title),
+        generateReadingNoteFromBook(geminiApiKey, book.title),
+      ])
+
+      setBookInfo(info)
+      if (note) {
+        setReadingNote(note)
+      }
+    } catch (err) {
+      setError(`聯網搜尋失敗：${err.message}`)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  // Main generate flow
   const handleGenerate = async () => {
     if (!apiKey.trim()) {
       setError('請先在「固定設定區」填入您的 Anthropic API Key')
@@ -33,7 +86,13 @@ function App() {
     setResults(null)
 
     try {
-      const data = await generatePosts(apiKey, creatorPosition, coreValues, readingNote)
+      // If book title is provided but no book info yet, search first
+      let context = bookInfo
+      if (bookTitle.trim() && !context && geminiApiKey.trim()) {
+        context = await handleSearchBook(bookTitle)
+      }
+
+      const data = await generatePosts(apiKey, creatorPosition, coreValues, readingNote, context)
       setResults(data)
     } catch (err) {
       setError(err.message)
@@ -63,6 +122,8 @@ function App() {
         <SettingsPanel
           apiKey={apiKey}
           setApiKey={setApiKey}
+          geminiApiKey={geminiApiKey}
+          setGeminiApiKey={setGeminiApiKey}
           creatorPosition={creatorPosition}
           setCreatorPosition={setCreatorPosition}
           coreValues={coreValues}
@@ -71,11 +132,20 @@ function App() {
 
         {/* Input */}
         <InputArea
+          bookTitle={bookTitle}
+          setBookTitle={setBookTitle}
           readingNote={readingNote}
           setReadingNote={setReadingNote}
           onGenerate={handleGenerate}
+          onRandomRecommend={handleRandomRecommend}
           isLoading={isLoading}
+          isSearching={isSearching}
         />
+
+        {/* Book Info from Search */}
+        {bookInfo && (
+          <BookInfoCard bookInfo={bookInfo} onDismiss={() => setBookInfo(null)} />
+        )}
 
         {/* Error */}
         {error && (
@@ -101,17 +171,18 @@ function App() {
         )}
 
         {/* Empty state */}
-        {!isLoading && !results && !error && (
+        {!isLoading && !results && !error && !bookInfo && (
           <div className="text-center py-16 text-gray-400">
             <div className="text-5xl mb-4">📖</div>
-            <p className="text-sm">在上方輸入你的讀書心得，AI 將幫你轉化為社群爆款貼文</p>
+            <p className="text-sm mb-2">在上方輸入你的讀書心得，AI 將幫你轉化為社群爆款貼文</p>
+            <p className="text-xs text-gray-300">或點擊「🎲 隨機推薦」，今天不用看書也能產出爆款心得！</p>
           </div>
         )}
       </main>
 
       {/* Footer */}
       <footer className="text-center py-6 text-xs text-gray-400">
-        BookSpark — 使用 Claude Sonnet 4.6 驅動 · React + Tailwind CSS
+        BookSpark — Claude Sonnet 4.6 + Gemini Google Search Grounding · React + Tailwind CSS
       </footer>
     </div>
   )
