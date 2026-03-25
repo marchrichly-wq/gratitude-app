@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { generatePosts } from './api/claude'
-import { searchBookInfo, generateReadingNoteFromBook } from './api/gemini'
+import { searchBookInfo, generateReadingNoteFromBook, fetchTrendingBooks } from './api/gemini'
 import SettingsPanel from './components/SettingsPanel'
 import InputArea from './components/InputArea'
 import BookInfoCard from './components/BookInfoCard'
@@ -22,6 +22,8 @@ function App() {
   const [results, setResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [trendingBooks, setTrendingBooks] = useState(null)
+  const [isFetchingTrending, setIsFetchingTrending] = useState(false)
   const [error, setError] = useState('')
 
   // Search book info via Gemini
@@ -37,6 +39,27 @@ function App() {
       return null
     } finally {
       setIsSearching(false)
+    }
+  }
+
+  // Fetch live trending books by category
+  const handleFetchTrending = async (category) => {
+    if (!geminiApiKey.trim()) {
+      setError('請先在「固定設定區」填入 Gemini API Key 以啟用即時熱門書單功能')
+      return
+    }
+
+    setError('')
+    setIsFetchingTrending(true)
+    setTrendingBooks(null)
+
+    try {
+      const data = await fetchTrendingBooks(geminiApiKey, category)
+      setTrendingBooks(data)
+    } catch (err) {
+      setError(`搜尋熱門書單失敗：${err.message}`)
+    } finally {
+      setIsFetchingTrending(false)
     }
   }
 
@@ -138,8 +161,11 @@ function App() {
           setReadingNote={setReadingNote}
           onGenerate={handleGenerate}
           onRandomRecommend={handleRandomRecommend}
+          onFetchTrending={handleFetchTrending}
           isLoading={isLoading}
           isSearching={isSearching}
+          trendingBooks={trendingBooks}
+          isFetchingTrending={isFetchingTrending}
         />
 
         {/* Book Info from Search */}

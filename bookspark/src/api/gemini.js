@@ -73,6 +73,86 @@ export async function searchBookInfo(geminiApiKey, bookTitle) {
 }
 
 /**
+ * Fetch trending/popular books by category via Google Search Grounding
+ * Returns a live list of books instead of relying on a static hardcoded list
+ */
+export async function fetchTrendingBooks(geminiApiKey, category) {
+  if (!geminiApiKey) return null
+
+  const categoryText = category || '理財、成功心理學、經營管理、個人成長、自律生活、溝通技巧、男女兩性'
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {
+                text: `請搜尋「${categoryText}」類別中，目前最新、最熱門、最多人討論的書籍。
+
+要求：
+1. 請搜尋 2024-2025 年最新的暢銷書、熱門書單、讀書社群推薦書目
+2. 混合經典長銷書與近期新書
+3. 優先選擇在台灣、華語圈有繁體中文版的書
+4. 回傳 10 本書
+
+請以 JSON 格式回傳：
+{
+  "books": [
+    {
+      "title": "書名（繁體中文）",
+      "author": "作者",
+      "category": "${category || '最佳分類'}",
+      "year": "出版年份或最近版本年份",
+      "hot_reason": "為什麼現在很熱門（20字內）"
+    }
+  ],
+  "search_date": "搜尋日期",
+  "source_hint": "資料來源提示（例如：博客來暢銷榜、Goodreads 等）"
+}
+
+重要：請只回傳純 JSON，不要加任何 markdown 標記或額外文字。`,
+              },
+            ],
+          },
+        ],
+        tools: [{ google_search: {} }],
+        generationConfig: {
+          temperature: 0.4,
+          maxOutputTokens: 2048,
+        },
+      }),
+    }
+  )
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}))
+    throw new Error(
+      err.error?.message || `Gemini API 請求失敗 (${response.status})`
+    )
+  }
+
+  const data = await response.json()
+  const parts = data.candidates?.[0]?.content?.parts || []
+  const textPart = parts.find((p) => p.text)
+  if (!textPart) return null
+
+  try {
+    const cleaned = textPart.text
+      .replace(/^```json\s*/, '')
+      .replace(/```\s*$/, '')
+      .trim()
+    return JSON.parse(cleaned)
+  } catch {
+    return null
+  }
+}
+
+/**
  * Generate a full reading note from book info (for random recommendation mode)
  */
 export async function generateReadingNoteFromBook(geminiApiKey, bookTitle) {
